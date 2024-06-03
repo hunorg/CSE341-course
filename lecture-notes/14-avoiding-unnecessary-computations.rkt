@@ -22,7 +22,7 @@
     (letrec ([slow-id (lambda (y z)
                         (if (= 0 z)
                         y
-                        (slow-id (- z 1))))])
+                        (slow-id y (- z 1))))])
         (+ (slow-id x 50000000) y)))
 
 ; multiplies x and result of y-thunk, calling y-thunk x times
@@ -32,6 +32,9 @@
           [(= x 1) (y-thunk)]
           [#t (+ (y-thunk) (my-mult (- x 1) y-thunk))]))
 
+(define my-mult-test (my-mult 99 (lambda () (slow-add 3 4))))
+(define my-mult-test2 (my-mult 99 (let ([x (slow-add 3 4)]) (lambda () x))))
+
 ; Best of both worlds 
 
 ; assuming some expensive computation has no side effects, ideally 
@@ -40,9 +43,9 @@
     ; remember the answer so future uses complete immediately 
 ; called lazy evaluation 
 
-; languages wheremostconstructs, including function arguments, 
+; languages where most constructs, including function arguments, 
 ; work this way are lazy languages 
-    ; Haskell
+    ; Haskell, Nix
 
 ; Racket predefines support for promises, but we can make our own 
     ; thunks and mutable pairs are enough 
