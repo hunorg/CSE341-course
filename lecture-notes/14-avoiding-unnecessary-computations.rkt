@@ -15,6 +15,8 @@
             ; (if (...) 0 (... (th) ...))
             ; ...
             ; (if (...) 0 (... (th) ...))))
+; this is a silly addition function that purposely runs slows for
+; demonstration purposes 
 
 (define (slow-add x y)
     (letrec ([slow-id (lambda (y z)
@@ -23,4 +25,24 @@
                         (slow-id (- z 1))))])
         (+ (slow-id x 50000000) y)))
 
+; multiplies x and result of y-thunk, calling y-thunk x times
 
+(define (my-mult x y-thunk) ; assumes x is >= 0 
+    (cond [(= x 0) 0]
+          [(= x 1) (y-thunk)]
+          [#t (+ (y-thunk) (my-mult (- x 1) y-thunk))]))
+
+; Best of both worlds 
+
+; assuming some expensive computation has no side effects, ideally 
+; we would: 
+    ; not compute until needed
+    ; remember the answer so future uses complete immediately 
+; called lazy evaluation 
+
+; languages wheremostconstructs, including function arguments, 
+; work this way are lazy languages 
+    ; Haskell
+
+; Racket predefines support for promises, but we can make our own 
+    ; thunks and mutable pairs are enough 
