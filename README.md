@@ -1,1 +1,1 @@
-# CSE341-course-part-B
+# CSE341-course
