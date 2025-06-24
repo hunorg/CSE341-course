@@ -110,6 +110,7 @@ type Move
     | Discard Card
 
 
+cardColor : Card -> Color
 cardColor c =
     case c.suit of
         Spade ->

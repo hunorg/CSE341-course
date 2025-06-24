@@ -17,6 +17,7 @@ type Valu
     | Constructor String Valu
 
 
+g : (() -> Int) -> (String -> Int) -> Pattern -> Int
 g f1 f2 ptrn =
     let
         r =
