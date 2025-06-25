@@ -63,7 +63,7 @@ absOfZSimpler =
 
 
 
--- Syntax is how we write things; semantics is what they mean
+-- Syntax is how we write things; semantics is what the expressions mean
 -- Type-checking happens before runtime
 -- Evaluation happens at runtime
 -- For variable bindings:
@@ -73,7 +73,7 @@ absOfZSimpler =
 
    We have seen many kinds of expressions: `34`, `True`, `False`, `x`, `e1 + e2`, `if e1 then e2 else e3`, ...
 
-   • Expressions can be arbitrarily large, since subexpressions can nest indefinitely.
+   • Expressions can be arbitrarily large; since subexpressions can nest indefinitely
 
    • Every kind of expression has:
      1. Syntax
