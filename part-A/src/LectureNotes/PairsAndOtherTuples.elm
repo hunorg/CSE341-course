@@ -82,3 +82,17 @@ sortPair ( x, y ) =
    • For larger collections, prefer using records
    • Access tuple elements via pattern matching only
 -}
+{- Nesting
+   • Pairs and tuples can be nested however you want
+     - Not a new feature: implied by the syntax and semantics
+-}
+
+
+x1 : ( Int, ( Bool, Int ) )
+x1 =
+    ( 1, ( True, 2 ) )
+
+
+x2 : ( ( Int, Int ), ( ( Int, Int ), ( Int, Int ) ) )
+x2 =
+    ( ( 1, 2 ), ( ( 3, 4 ), ( 5, 6 ) ) )
