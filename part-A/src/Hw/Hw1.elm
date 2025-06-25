@@ -1,4 +1,4 @@
-module Hw1 exposing (..)
+module Hw.Hw1 exposing (..)
 
 import Maybe.Extra exposing (..)
 import Tuple3 exposing (..)
