@@ -56,26 +56,71 @@ x7 =
      - List.isEmpty e evaluates to True if and only if e evaluates to []
      - If e evaluates to [v1, ..., vn], then List.head e evaluates to v1
      - If e evaluates to [v1, ..., vn], then List.tail e evaluates to [v2, ..., vn]
-       - Notice result is a list
+   • In Elm, List.head and List.tail return a Maybe to handle the case of an empty input list safely
 -}
 
 
 x8 : Bool
 x8 =
-    List.isEmpty []
+    List.isEmpty [ 1, 2 ]
+
+
+
+-- False
 
 
 x9 : Maybe number
 x9 =
-    List.head [ 1, 2, 3 ]
+    List.head [ 42, 99 ]
 
 
-x10 : Maybe (List number)
+
+-- Just 42
+
+
+x10 : Maybe number
 x10 =
-    List.tail [ 1, 2, 3 ]
+    List.head [ 5 ]
 
 
 
+-- Just 5
+
+
+x11 : Maybe number
+x11 =
+    List.head []
+
+
+
+-- Nothing
+
+
+x12 : Maybe (List number)
+x12 =
+    List.tail [ 42, 99 ]
+
+
+
+-- Just [ 99 ]
+
+
+x13 : Maybe (List number)
+x13 =
+    List.tail [ 5 ]
+
+
+
+-- Just []
+
+
+x14 : Maybe (List number)
+x14 =
+    List.tail []
+
+
+
+-- Nothing
 {- Type-checking list operations:
    • Lots of new types: For any type t, the type List t describes lists
      where all elements are of type t

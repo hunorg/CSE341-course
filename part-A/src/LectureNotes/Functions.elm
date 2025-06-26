@@ -48,18 +48,18 @@ fortytwo =
      - x1, ..., xn are variable names
      - t1, ..., tn are types
      - e is an expression
-
-   • Evaluation:
-     - A function is a value! (No evaluation yet)
-     - Adds x0 to the environment so later expressions can call it
-     - Function-call semantics will also allow recursion
-
    • Type-checking:
      - Adds binding x0 : t1 -> ... -> tn -> t if:
          • The body e can be type-checked to have type t in the static environment containing:
              - The "enclosing" static environment (earlier bindings)
              - x1 : t1, ..., xn : tn (arguments with their types)
              - x0 : t1 -> ... -> tn -> t (for recursive calls)
+   • Evaluation:
+     - A function is a value! (No evaluation yet)
+     - Adds x0 to the environment so later expressions can call it
+     - Function-call semantics will also allow recursion
+
+
 -}
 {- More on type-checking:
 
