@@ -52,28 +52,44 @@ max1 xs =
 
 
 
-{- max1 [3, 7, 5]
-   ├─ hd = 3, tl = [7, 5]
-   ├─ tlAns = max1 [7, 5]     <-- recursive call
-   │
-   │  max1 [7, 5]
-   │    ├─ hd = 7, tl = [5]
-   │    ├─ tlAns = max1 [5]   <-- recursive call
-   │    │
-   │    │  max1 [5]
-   │    │    ├─ hd = 5, tl = []
-   │    │    ├─ tlAns = max1 []  <-- recursive call
-   │    │    │
-   │    │    │  max1 [] = Nothing  (base case)
-   │    │    │
-   │    │    ├─ tlAns = Nothing
-   │    │    └─ returns Just 5  (since tail is empty)
-   │    │
-   │    ├─ tlAns = Just 5
-   │    ├─ Compare hd (7) and val inside tlAns (5)
-   │    └─ 7 > 5 → return Just 7
-   │
-   ├─ tlAns = Just 7
-   ├─ Compare hd (3) and val inside tlAns (7)
-   └─ 7 > 3 → return Just 7  (final result)
+{- RECURSION UNFOLDED: MAX1 EXECUTION VISUALIZATION
+
+   Input: max1 [3,7,5]
+
+   1.  CALL STACK BUILDING (Downward Descent)
+       • max1 [3,7,5]
+       hd = 3, tl = [7,5]
+       → Pauses: needs max1 [7,5]
+       • max1 [7,5]
+       hd = 7, tl = [5]
+       → Pauses: needs max1 [5]
+       • max1 [5]
+       hd = 5, tl = []
+       → Pauses: needs max1 []
+       • max1 []
+       → Returns: Nothing
+
+   2.  SOLUTION BUILDING (Upward Ascent)
+       • max1 [5] resumes with tlAns = Nothing
+       → Returns: Just 5
+       • max1 [7,5] resumes with tlAns = Just 5
+       → Compares: 5 > 7? False → returns Just 7
+       • max1 [3,7,5] resumes with tlAns = Just 7
+       → Compares: 7 > 3? True → returns Just 7
+
+   3. UNIVERSAL RECURSION MECHANICS
+   • Pause: Each call waits for its subproblem's solution
+   • Resume: Each call completes using the sub-solution
+   • Base case: Provides the initial solution
+   • Recompose: Apply problem-specific combinator
+        current-state ⊗ sub-solution → new-solution
+
+   4.  DATA TRANSFORMATION
+       Problem size: [3,7,5] → [7,5] → [5] → []
+       Solutions: Nothing ← Just 5 ← Just 7 ← Just 7
+
+   Key: Recursion =
+   • Downward: Problem decomposition
+   • Upward: Solution composition
+
 -}
