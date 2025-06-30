@@ -52,44 +52,53 @@ max1 xs =
 
 
 
-{- RECURSION UNFOLDED: MAX1 EXECUTION VISUALIZATION
+{-
+   RECURSION UNFOLDED: MAX1 EXECUTION VISUALIZATION
 
-   Input: max1 [3,7,5]
+   1. EXECUTION FLOW FOR [3,7,5]
 
-   1.  CALL STACK BUILDING (Downward Descent)
-       • max1 [3,7,5]
-       hd = 3, tl = [7,5]
-       → Pauses: needs max1 [7,5]
-       • max1 [7,5]
-       hd = 7, tl = [5]
-       → Pauses: needs max1 [5]
-       • max1 [5]
-       hd = 5, tl = []
-       → Pauses: needs max1 []
-       • max1 []
-       → Returns: Nothing
+      DOWNWARD PHASE (Problem Decomposition)
+      • max1 [3,7,5]
+           hd = 3, tl = [7,5]
+           → Pauses: needs max1 [7,5]
+      • max1 [7,5]
+           hd = 7, tl = [5]
+           → Pauses: needs max1 [5]
+      • max1 [5]
+           hd = 5, tl = []
+           → Pauses: needs max1 []
+      • max1 []
+           → Returns: Nothing
 
-   2.  SOLUTION BUILDING (Upward Ascent)
-       • max1 [5] resumes with tlAns = Nothing
-       → Returns: Just 5
-       • max1 [7,5] resumes with tlAns = Just 5
-       → Compares: 5 > 7? False → returns Just 7
-       • max1 [3,7,5] resumes with tlAns = Just 7
-       → Compares: 7 > 3? True → returns Just 7
+      UPWARD PHASE (Solution Composition)
+      • max1 [5] resumes with tlAns = Nothing
+           → Returns: Just 5
+      • max1 [7,5] resumes with tlAns = Just 5
+           → Returns: Just 7 (5 > 7? False)
+      • max1 [3,7,5] resumes with tlAns = Just 7
+           → Returns: Just 7 (7 > 3? True)
 
-   3. UNIVERSAL RECURSION MECHANICS
-   • Pause: Each call waits for its subproblem's solution
-   • Resume: Each call completes using the sub-solution
-   • Base case: Provides the initial solution
-   • Recompose: Apply problem-specific combinator
-        current-state ⊗ sub-solution → new-solution
+   2. UNIVERSAL RECURSION PRINCIPLES
 
-   4.  DATA TRANSFORMATION
-       Problem size: [3,7,5] → [7,5] → [5] → []
-       Solutions: Nothing ← Just 5 ← Just 7 ← Just 7
+      All recursive functions follow this pattern:
+      • Base Case: Solve smallest problem directly
+           (max1: [] → Nothing)
+      • Recursive Case:
+           1. Decompose: Break into smaller subproblem
+                 (max1: split list → head + tail)
+           2. Recurse: Solve subproblem → pauses current
+           3. Recompose: Combine using problem-specific logic
+                 (max1: select larger of head and tail's max)
 
-   Key: Recursion =
-   • Downward: Problem decomposition
-   • Upward: Solution composition
+   3. KEY MECHANISMS
+      • Pause/Resume: Call stack manages execution flow
+      • Problem Reduction: Input shrinks toward base case
+           [3,7,5] → [7,5] → [5] → []
+      • Solution Construction: Results build upward
+           Nothing → Just 5 → Just 7 → Just 7
 
+   4. RECURSION ESSENCE
+      Downward: Problem decomposition
+      Upward: Solution composition
+      Core: Base Case + (Decompose → Recurse → Recompose)
 -}
