@@ -7,6 +7,7 @@ badMax : List Int -> Int
 badMax xs =
     case xs of
         [] ->
+            -- horrible style to use 0 here, we'll fix it later
             0
 
         [ x ] ->
@@ -24,6 +25,7 @@ goodMax : List Int -> Int
 goodMax xs =
     case xs of
         [] ->
+            -- horrible style to use 0 here, we'll fix it later
             0
 
         [ x ] ->
