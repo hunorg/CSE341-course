@@ -79,7 +79,7 @@ numberBeforeReachingSum sum ints =
             0
 
         x :: xs ->
-            if sum <= 1 then
+            if (sum - x) <= 0 then
                 0
 
             else
@@ -93,7 +93,7 @@ whatMonth day =
         months =
             [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
     in
-    numberBeforeReachingSum day months
+    numberBeforeReachingSum day months + 1
 
 
 monthRange : Int -> Int -> List Int
@@ -113,15 +113,16 @@ oldest dates =
 
         x :: xs ->
             let
-                ans =
+                oldestTail =
                     oldest xs
             in
-            if isJust ans then
-                if isOlder x (Maybe.withDefault ( 1, 1, 1 ) ans) then
-                    ans
-
-                else
+            case oldestTail of
+                Nothing ->
                     Just x
 
-            else
-                Just x
+                Just x_ ->
+                    if isOlder x x_ then
+                        Just x
+
+                    else
+                        oldestTail
