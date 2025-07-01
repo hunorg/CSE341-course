@@ -1,5 +1,6 @@
 module Hw.Hw1 exposing (..)
 
+import List.Extra
 import Maybe.Extra exposing (..)
 import Tuple3 exposing (..)
 
@@ -31,6 +32,30 @@ numberInMonths dates months =
 
         m1 :: mr ->
             numberInMonth dates m1 + numberInMonths dates mr
+
+
+datesInMonth : List ( Int, Int, Int ) -> Int -> List ( Int, Int, Int )
+datesInMonth dates month =
+    case dates of
+        [] ->
+            []
+
+        d1 :: dr ->
+            if second d1 == month then
+                d1 :: datesInMonth dr month
+
+            else
+                datesInMonth dr month
+
+
+datesInMonths : List ( Int, Int, Int ) -> List Int -> List ( Int, Int, Int )
+datesInMonths dates months =
+    case months of
+        [] ->
+            []
+
+        m1 :: mr ->
+            datesInMonth dates m1 ++ datesInMonths dates mr
 
 
 getNth : List String -> Int -> String
@@ -78,12 +103,12 @@ numberBeforeReachingSum sum ints =
         [] ->
             0
 
-        x :: xs ->
-            if (sum - x) <= 0 then
+        i1 :: ir ->
+            if (sum - i1) <= 0 then
                 0
 
             else
-                1 + numberBeforeReachingSum (sum - x) xs
+                1 + numberBeforeReachingSum (sum - i1) ir
 
 
 whatMonth : Int -> Int
@@ -111,18 +136,100 @@ oldest dates =
         [] ->
             Nothing
 
-        x :: xs ->
+        d1 :: dr ->
             let
                 oldestTail =
-                    oldest xs
+                    oldest dr
             in
             case oldestTail of
                 Nothing ->
-                    Just x
+                    Just d1
 
                 Just x_ ->
-                    if isOlder x x_ then
-                        Just x
+                    if isOlder d1 x_ then
+                        Just d1
 
                     else
                         oldestTail
+
+
+
+-- CHALLENGE PROBLEMS:
+
+
+removeDuplicates : List comparable -> List comparable
+removeDuplicates xs =
+    let
+        isInList : comparable -> List comparable -> Bool
+        isInList y ys =
+            case ys of
+                [] ->
+                    False
+
+                y1 :: yr ->
+                    if y == y1 then
+                        True
+
+                    else
+                        isInList y yr
+    in
+    case xs of
+        [] ->
+            []
+
+        x :: xs_ ->
+            if isInList x xs_ then
+                removeDuplicates xs_
+
+            else
+                x :: removeDuplicates xs_
+
+
+numberInMonthsChallenge : List ( Int, Int, Int ) -> List Int -> Int
+numberInMonthsChallenge dates months =
+    numberInMonths dates (removeDuplicates months)
+
+
+datesInMonthsChallenge : List ( Int, Int, Int ) -> List Int -> List ( Int, Int, Int )
+datesInMonthsChallenge dates months =
+    datesInMonths dates (removeDuplicates months)
+
+
+isValidDate : ( Int, Int, Int ) -> Bool
+isValidDate ( y, m, d ) =
+    let
+        isValidYear : Bool
+        isValidYear =
+            y > 0
+
+        isValidMonth : Bool
+        isValidMonth =
+            m >= 1 && m <= 12
+
+        isValidDay : Bool
+        isValidDay =
+            let
+                daysInMonth : List Int
+                daysInMonth =
+                    let
+                        daysInFebruary : Int
+                        daysInFebruary =
+                            if modBy 4 y == 0 && modBy 100 y /= 0 || modBy 400 y == 0 then
+                                29
+
+                            else
+                                28
+                    in
+                    [ 31, daysInFebruary, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
+
+                isValidMaximumDay =
+                    case List.Extra.getAt (m - 1) daysInMonth of
+                        Just x ->
+                            d <= x
+
+                        Nothing ->
+                            False
+            in
+            d >= 1 && d <= 31 && isValidMaximumDay
+    in
+    isValidYear && isValidMonth && isValidDay
