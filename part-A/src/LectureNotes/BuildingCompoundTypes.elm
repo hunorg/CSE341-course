@@ -15,14 +15,61 @@ module LectureNotes.BuildingCompoundTypes exposing (..)
 -}
 {- Examples:
    • Tuples build each-of types
-     - (Int, Bool) contains and Int and a Bool
+     - (Int, Bool) contains an Int and a Bool
+-}
+
+
+exampleTuple : ( Int, Bool )
+exampleTuple =
+    ( 42, True )
+
+
+
+{-
    • Maybes build one-of types
      - Maybe Int contains an Int or it contains no data
+-}
+
+
+exampleMaybe : Maybe Int
+exampleMaybe =
+    Just 5
+
+
+noValue : Maybe Int
+noValue =
+    Nothing
+
+
+
+{-
    • Lists use all three building blocks
      - List Int contains an Int and another List Int or it contains no data
-   • And of course we can nest compound types
-     - Maybe (Maybe (Int, Int), List (List Int))
 -}
+
+
+exampleList : List Int
+exampleList =
+    [ 1, 2, 3 ]
+
+
+emptyList : List Int
+emptyList =
+    []
+
+
+
+{- And of course we can nest compound types
+   - Maybe (Maybe (Int, Int), List (List Int))
+-}
+
+
+nestedExample : Maybe ( Maybe ( Int, Int ), List (List Int) )
+nestedExample =
+    Just ( Just ( 3, 4 ), [ [ 1, 2 ], [], [ 5 ] ] )
+
+
+
 {- Coming soon:
    • Another way to build each-of types in Elm:
      - Records: have named fields
@@ -41,7 +88,3 @@ module LectureNotes.BuildingCompoundTypes exposing (..)
    • Later in course: How OOP does one-of types
      - Key contrast with procedural and functional programming
 -}
-
-
-hello =
-    "hello"
