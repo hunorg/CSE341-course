@@ -1,6 +1,5 @@
 module Hw.Hw1 exposing (..)
 
-import List.Extra
 import Maybe.Extra exposing (..)
 import Tuple3 exposing (..)
 
@@ -16,12 +15,12 @@ numberInMonth dates month =
         [] ->
             0
 
-        d1 :: dr ->
+        d1 :: dates_ ->
             if second d1 == month then
-                1 + numberInMonth dr month
+                1 + numberInMonth dates_ month
 
             else
-                numberInMonth dr month
+                numberInMonth dates_ month
 
 
 numberInMonths : List ( Int, Int, Int ) -> List Int -> Int
@@ -30,8 +29,8 @@ numberInMonths dates months =
         [] ->
             0
 
-        m1 :: mr ->
-            numberInMonth dates m1 + numberInMonths dates mr
+        m1 :: months_ ->
+            numberInMonth dates m1 + numberInMonths dates months_
 
 
 datesInMonth : List ( Int, Int, Int ) -> Int -> List ( Int, Int, Int )
@@ -40,12 +39,12 @@ datesInMonth dates month =
         [] ->
             []
 
-        d1 :: dr ->
+        d1 :: dates_ ->
             if second d1 == month then
-                d1 :: datesInMonth dr month
+                d1 :: datesInMonth dates_ month
 
             else
-                datesInMonth dr month
+                datesInMonth dates_ month
 
 
 datesInMonths : List ( Int, Int, Int ) -> List Int -> List ( Int, Int, Int )
@@ -54,8 +53,8 @@ datesInMonths dates months =
         [] ->
             []
 
-        m1 :: mr ->
-            datesInMonth dates m1 ++ datesInMonths dates mr
+        m1 :: months_ ->
+            datesInMonth dates m1 ++ datesInMonths dates months_
 
 
 getNth : List String -> Int -> String
@@ -64,7 +63,7 @@ getNth strings nth =
         [] ->
             ""
 
-        s1 :: sr ->
+        s1 :: strings_ ->
             if nth < 1 then
                 ""
 
@@ -72,7 +71,7 @@ getNth strings nth =
                 s1
 
             else
-                getNth sr (nth - 1)
+                getNth strings_ (nth - 1)
 
 
 dateToString : ( Int, Int, Int ) -> String
@@ -103,12 +102,12 @@ numberBeforeReachingSum sum ints =
         [] ->
             0
 
-        i1 :: ir ->
+        i1 :: ints_ ->
             if (sum - i1) <= 0 then
                 0
 
             else
-                1 + numberBeforeReachingSum (sum - i1) ir
+                1 + numberBeforeReachingSum (sum - i1) ints_
 
 
 whatMonth : Int -> Int
@@ -136,17 +135,17 @@ oldest dates =
         [] ->
             Nothing
 
-        d1 :: dr ->
+        d1 :: dates_ ->
             let
                 oldestTail =
-                    oldest dr
+                    oldest dates_
             in
             case oldestTail of
                 Nothing ->
                     Just d1
 
-                Just x_ ->
-                    if isOlder d1 x_ then
+                Just val ->
+                    if isOlder d1 val then
                         Just d1
 
                     else
@@ -166,12 +165,12 @@ removeDuplicates xs =
                 [] ->
                     False
 
-                y1 :: yr ->
+                y1 :: ys_ ->
                     if y == y1 then
                         True
 
                     else
-                        isInList y yr
+                        isInList y ys_
     in
     case xs of
         [] ->
@@ -222,8 +221,24 @@ isValidDate ( y, m, d ) =
                     in
                     [ 31, daysInFebruary, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
+                getAt : Int -> List a -> Maybe a
+                getAt idx xs =
+                    case xs of
+                        [] ->
+                            Nothing
+
+                        x :: xs_ ->
+                            if idx < 0 then
+                                Nothing
+
+                            else if idx == 0 then
+                                Just x
+
+                            else
+                                getAt (idx - 1) xs_
+
                 isValidMaximumDay =
-                    case List.Extra.getAt (m - 1) daysInMonth of
+                    case getAt (m - 1) daysInMonth of
                         Just x ->
                             d <= x
 
