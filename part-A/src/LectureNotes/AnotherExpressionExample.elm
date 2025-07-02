@@ -4,12 +4,13 @@ import LectureNotes.UsefulDatatypes exposing (..)
 
 
 
--- Let's define maxConstant : Exp -> Int
--- Good example of combining several topics as we program:
--- Case expressions
--- Local helper functions
--- Avoiding repeated recursion
--- Simpler solution by using library functions
+{- Let's define maxConstant : Exp -> Int
+   Good example of combining several topics as we program:
+    - Case expressions
+    - Local helper functions
+    - Avoiding repeated recursion
+    - Simpler solution by using library functions
+-}
 
 
 maxConstant : Exp -> Int
