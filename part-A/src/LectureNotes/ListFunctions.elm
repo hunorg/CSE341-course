@@ -3,6 +3,11 @@ module LectureNotes.ListFunctions exposing (..)
 import LectureNotes.VariableBindingsAndExpressions exposing (x)
 
 
+
+-- SEE LECTURE NOTE ListsAndOptionsAreDatatypes AND
+-- OTHER PATTERN MATCHING RELATED NOTES
+
+
 sumList : List number -> number
 sumList xs =
     case xs of
