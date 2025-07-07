@@ -206,3 +206,92 @@ officiateTests =
                 == Nothing
     in
     [ test1, test2, test3, test4, test5, test6 ]
+
+
+scoreChallengeTests =
+    [ scoreChallenge [] 21 == 10
+    , scoreChallenge [ testCards.heartA ] 21 == 5
+    , scoreChallenge [ testCards.heartA, testCards.clubK ] 21 == 0
+    , scoreChallenge [ testCards.heartA, testCards.clubA ] 21 == 3
+    , scoreChallenge [ testCards.heartA, testCards.clubA, testCards.diamond5 ] 21 == 4
+    , scoreChallenge [ testCards.heartA, testCards.clubA, testCards.spade2, testCards.heartQ ] 21 == 7
+    , scoreChallenge [ testCards.heartA, testCards.clubA, testCards.spade2, testCards.heartQ ] 19 == 5
+    ]
+
+
+officiateChallengeTests =
+    let
+        test1 =
+            officiateChallenge
+                [ testCards.spade2, testCards.heartA ]
+                [ Draw, Draw ]
+                10
+                == Just 7
+
+        test2 =
+            officiateChallenge
+                [ testCards.spade1, testCards.clubK ]
+                [ Draw, Discard testCards.spade1, Draw ]
+                10
+                == Just 0
+
+        test3 =
+            officiateChallenge
+                [ testCards.heartA, testCards.clubA ]
+                [ Draw, Draw ]
+                20
+                == Just 6
+
+        test4 =
+            officiateChallenge
+                [ testCards.diamond5, testCards.heartQ ]
+                [ Draw, Discard testCards.heartQ ]
+                15
+                == Nothing
+
+        test5 =
+            officiateChallenge [] [ Draw ] 10 == Just 5
+
+        test6 =
+            officiateChallenge
+                [ testCards.spade2, testCards.heartA ]
+                [ Draw, Discard testCards.clubK ]
+                10
+                == Nothing
+    in
+    [ test1, test2, test3, test4, test5, test6 ]
+
+
+carefulPlayerTests =
+    let
+        test1 =
+            carefulPlayer
+                [ testCards.spade2, testCards.heartA ]
+                15
+                == [ Draw, Draw ]
+
+        test2 =
+            carefulPlayer
+                [ testCards.clubK, testCards.diamond5 ]
+                13
+                == [ Draw ]
+
+        test3 =
+            carefulPlayer
+                [ testCards.heartA, testCards.spade2, testCards.clubK ]
+                13
+                == [ Draw ]
+
+        test4 =
+            carefulPlayer
+                [ testCards.clubK ]
+                13
+                == [ Draw ]
+
+        test5 =
+            carefulPlayer
+                [ testCards.clubK, testCards.heartQ ]
+                20
+                == [ Draw ]
+    in
+    [ test1, test2, test3, test4, test5 ]

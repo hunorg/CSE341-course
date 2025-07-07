@@ -230,3 +230,152 @@ officiate csArg movesArg goal =
                             Nothing
     in
     aux csArg [] movesArg
+
+
+
+-- CHALLENGE PROBLEMS:
+
+
+allPossibleSums : List Card -> List Int
+allPossibleSums csArg =
+    let
+        addToAll : List Int -> Int -> List Int
+        addToAll xs y =
+            case xs of
+                [] ->
+                    []
+
+                x :: xs_ ->
+                    x + y :: addToAll xs_ y
+
+        aux cs acc =
+            case cs of
+                [] ->
+                    acc
+
+                c :: cs_ ->
+                    if c.rank == Ace then
+                        aux cs_ (addToAll acc 1) ++ aux cs_ (addToAll acc 11)
+
+                    else
+                        aux cs_ (addToAll acc (cardValue c))
+    in
+    aux csArg [ 0 ]
+
+
+scoreChallenge : List Card -> Int -> Int
+scoreChallenge csArg goal =
+    let
+        toScore : Int -> Int
+        toScore sum =
+            let
+                preliminaryScore =
+                    if sum > goal then
+                        3 * (sum - goal)
+
+                    else
+                        goal - sum
+            in
+            if allSameColor csArg then
+                max 0 (preliminaryScore // 2)
+
+            else
+                preliminaryScore
+
+        allScores sums =
+            case sums of
+                [] ->
+                    []
+
+                sum :: sums_ ->
+                    toScore sum :: allScores sums_
+    in
+    case List.minimum (allScores (allPossibleSums csArg)) of
+        Just bestScore ->
+            bestScore
+
+        Nothing ->
+            0
+
+
+officiateChallenge : List Card -> List Move -> Int -> Maybe Int
+officiateChallenge csArg movesArg goal =
+    let
+        aux cs held moves =
+            case moves of
+                [] ->
+                    Just (scoreChallenge held goal)
+
+                Draw :: moves_ ->
+                    case cs of
+                        [] ->
+                            Just (scoreChallenge held goal)
+
+                        c :: cs_ ->
+                            let
+                                allSumsGreaterThanGoal sums =
+                                    List.all (\x -> x > goal) sums
+                            in
+                            if allSumsGreaterThanGoal (allPossibleSums (c :: held)) then
+                                Just (scoreChallenge held goal)
+
+                            else
+                                aux cs_ (c :: held) moves_
+
+                (Discard c) :: moves_ ->
+                    case removeCard held c of
+                        Just held_ ->
+                            aux cs held_ moves_
+
+                        _ ->
+                            Nothing
+    in
+    aux csArg [] movesArg
+
+
+carefulPlayer : List Card -> Int -> List Move
+carefulPlayer csArg goal =
+    let
+        aux cs held moves =
+            case cs of
+                [] ->
+                    moves
+
+                c :: cs_ ->
+                    let
+                        shouldStop : Bool
+                        shouldStop =
+                            score held goal == 0
+
+                        shouldDraw : Bool
+                        shouldDraw =
+                            sumCards (c :: held) <= goal && goal - sumCards held > 10
+
+                        shouldDiscardAndDraw : List Card -> Maybe ( Card, List Card )
+                        shouldDiscardAndDraw heldCards =
+                            case heldCards of
+                                [] ->
+                                    Nothing
+
+                                cardToDiscard :: heldCards_ ->
+                                    if sumCards (c :: heldCards_) <= goal && score (c :: heldCards_) goal == 0 then
+                                        Just ( cardToDiscard, heldCards_ )
+
+                                    else
+                                        shouldDiscardAndDraw heldCards_
+                    in
+                    if shouldStop then
+                        moves
+
+                    else if shouldDraw then
+                        aux cs_ (c :: held) (moves ++ [ Draw ])
+
+                    else
+                        case shouldDiscardAndDraw held of
+                            Just ( cardToDiscard, newHeld ) ->
+                                aux cs_ (c :: newHeld) (moves ++ [ Discard cardToDiscard, Draw ])
+
+                            Nothing ->
+                                moves
+    in
+    aux csArg [] []
