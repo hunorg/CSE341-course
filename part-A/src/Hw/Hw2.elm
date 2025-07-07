@@ -7,14 +7,14 @@ allExceptMaybe s ss =
         [] ->
             Nothing
 
-        s1 :: ssr ->
-            if s == s1 then
-                Just ssr
+        x :: xs ->
+            if s == x then
+                Just xs
 
             else
-                case allExceptMaybe s ssr of
+                case allExceptMaybe s xs of
                     Just ys ->
-                        Just (s1 :: ys)
+                        Just (x :: ys)
 
                     _ ->
                         Nothing
@@ -26,30 +26,31 @@ getSubstitutions1 subs s =
         [] ->
             []
 
-        sl :: slr ->
-            case allExceptMaybe s sl of
-                Nothing ->
-                    getSubstitutions1 slr s
+        sub :: subs_ ->
+            case allExceptMaybe s sub of
+                Just ys ->
+                    ys ++ getSubstitutions1 subs_ s
 
-                Just vmik ->
-                    vmik ++ getSubstitutions1 slr s
+                Nothing ->
+                    getSubstitutions1 subs_ s
 
 
 getSubstitutions2 : List (List String) -> String -> List String
 getSubstitutions2 subsArg s =
     let
-        aux subs result =
+        aux : List (List String) -> List String -> List String
+        aux subs acc =
             case subs of
-                sl :: slr ->
-                    case allExceptMaybe s sl of
-                        Nothing ->
-                            aux slr result
+                sub :: subs_ ->
+                    case allExceptMaybe s sub of
+                        Just ys ->
+                            aux subs_ (acc ++ ys)
 
-                        Just vmik ->
-                            aux slr (result ++ vmik)
+                        Nothing ->
+                            aux subs_ acc
 
                 [] ->
-                    result
+                    acc
     in
     aux subsArg []
 
@@ -62,21 +63,22 @@ type alias FullName =
 
 
 similarNames : List (List String) -> FullName -> List FullName
-similarNames sssl fulln =
+similarNames subs fullName =
     let
-        substitutions =
-            getSubstitutions2 sssl fulln.first
+        variants : List String
+        variants =
+            getSubstitutions2 subs fullName.first
 
-        aux : List String -> List FullName
-        aux subs =
-            case subs of
+        aux : List String -> List FullName -> List FullName
+        aux strings acc =
+            case strings of
                 [] ->
-                    []
+                    acc
 
-                sub1 :: subsr ->
-                    { first = sub1, last = fulln.last, middle = fulln.middle } :: aux subsr
+                s :: strings_ ->
+                    aux strings_ ({ fullName | first = s } :: acc)
     in
-    fulln :: aux substitutions
+    fullName :: aux variants []
 
 
 type Suit
@@ -137,19 +139,19 @@ cardValue c =
 
 
 removeCard : List Card -> Card -> Maybe (List Card)
-removeCard lc c =
-    case lc of
+removeCard cs c =
+    case cs of
         [] ->
             Nothing
 
-        c1 :: csr ->
-            if c1 == c then
-                Just csr
+        card :: cs_ ->
+            if card == c then
+                Just cs_
 
             else
-                case removeCard csr c of
-                    Just csrr ->
-                        Just (c1 :: csrr)
+                case removeCard cs_ c of
+                    Just ys ->
+                        Just (card :: ys)
 
                     _ ->
                         Nothing
@@ -164,22 +166,22 @@ allSameColor cs =
         _ :: [] ->
             True
 
-        c1 :: cn :: csr ->
-            cardColor c1 == cardColor cn && allSameColor csr
+        c :: c_ :: cs_ ->
+            cardColor c == cardColor c_ && allSameColor (c_ :: cs_)
 
 
 sumCards : List Card -> Int
-sumCards cs =
+sumCards csArg =
     let
-        aux csa result =
-            case csa of
+        aux cs acc =
+            case cs of
                 [] ->
-                    result
+                    acc
 
-                c1 :: csr ->
-                    aux csr (result + cardValue c1)
+                c :: cs_ ->
+                    aux cs_ (acc + cardValue c)
     in
-    aux cs 0
+    aux csArg 0
 
 
 score : List Card -> Int -> Int
@@ -193,38 +195,38 @@ score cs goal =
                 goal - sumCards cs
     in
     if allSameColor cs then
-        preliminaryScore // 2
+        max 0 (preliminaryScore // 2)
 
     else
         preliminaryScore
 
 
 officiate : List Card -> List Move -> Int -> Maybe Int
-officiate csArg mvs gl =
+officiate csArg movesArg goal =
     let
-        aux cs hcs moves goal =
+        aux cs held moves =
             case moves of
                 [] ->
-                    Just (score hcs gl)
+                    Just (score held goal)
 
-                Draw :: mvsr ->
+                Draw :: moves_ ->
                     case cs of
                         [] ->
-                            Just (score hcs gl)
+                            Just (score held goal)
 
-                        c1 :: csr ->
-                            if sumCards (c1 :: hcs) > goal then
-                                Just (score hcs gl)
+                        c :: cs_ ->
+                            if sumCards (c :: held) > goal then
+                                Just (score held goal)
 
                             else
-                                aux csr (c1 :: hcs) mvsr gl
+                                aux cs_ (c :: held) moves_
 
-                (Discard c) :: mvsr ->
-                    case removeCard hcs c of
-                        Just hcsRmvd ->
-                            aux cs hcsRmvd mvsr goal
+                (Discard c) :: moves_ ->
+                    case removeCard held c of
+                        Just held_ ->
+                            aux cs held_ moves_
 
                         _ ->
                             Nothing
     in
-    aux csArg [] mvs gl
+    aux csArg [] movesArg
