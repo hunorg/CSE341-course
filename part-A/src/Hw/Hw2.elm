@@ -358,7 +358,7 @@ carefulPlayer csArg goal =
                                     Nothing
 
                                 cardToDiscard :: heldCards_ ->
-                                    if sumCards (c :: heldCards_) <= goal && score (c :: heldCards_) goal == 0 then
+                                    if sumCards (c :: heldCards_) <= goal && score (c :: heldCards_) goal == 0 && goal - sumCards held > 10 then
                                         Just ( cardToDiscard, heldCards_ )
 
                                     else
