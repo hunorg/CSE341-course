@@ -36,6 +36,7 @@ sqrtOfAbs5 =
     abs >> toFloat >> sqrt
 
 
+backup1 : (a -> Maybe b) -> (a -> b) -> a -> b
 backup1 f g =
     \x ->
         case f x of

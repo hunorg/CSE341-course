@@ -1,5 +1,7 @@
 module Hw.Hw3 exposing (..)
 
+import Array exposing (get)
+
 
 type Pattern
     = Wildcard
@@ -43,8 +45,8 @@ g f1 f2 ptrn =
 onlyCapitals : List String -> List String
 onlyCapitals xs =
     let
-        isUpper : String -> Bool
-        isUpper s =
+        startsWithUpper : String -> Bool
+        startsWithUpper s =
             case String.toList s of
                 [] ->
                     False
@@ -52,7 +54,7 @@ onlyCapitals xs =
                 y :: _ ->
                     Char.isUpper y
     in
-    List.filter isUpper xs
+    List.filter startsWithUpper xs
 
 
 longestString1 : List String -> String
@@ -86,31 +88,31 @@ longestString2 xs =
 longestStringHelper : (Int -> Int -> Bool) -> List String -> String
 longestStringHelper f =
     List.foldl
-        (\e a ->
+        (\x y ->
             let
-                sl1 =
-                    String.length e
+                lenX =
+                    String.length x
 
-                sl2 =
-                    String.length a
+                lenY =
+                    String.length y
             in
-            if f sl1 sl2 then
-                e
+            if f lenX lenY then
+                x
 
             else
-                a
+                y
         )
         ""
 
 
 longestString3 : List String -> String
 longestString3 =
-    longestStringHelper (\f s -> f > s)
+    longestStringHelper (\lenX lenY -> lenX > lenY)
 
 
 longestString4 : List String -> String
 longestString4 =
-    longestStringHelper (\f s -> f >= s)
+    longestStringHelper (\lenX lenY -> lenX >= lenY)
 
 
 longestCapitalized : List String -> String
@@ -129,46 +131,35 @@ firstAnswer f xs =
         [] ->
             Nothing
 
-        x :: xss ->
+        x :: xs_ ->
             if f x == Nothing then
-                firstAnswer f xss
+                firstAnswer f xs_
 
             else
                 f x
 
 
 
--- firstAnswer returns Maybe b cause there are no exceptions in ELM
+-- firstAnswer returns Maybe b cause there are no exceptions in Elm
 
 
 allAnswers : (a -> Maybe (List b)) -> List a -> Maybe (List b)
 allAnswers f xs =
     let
-        aux : (a -> Maybe (List b)) -> List a -> List b -> Maybe (List b)
-        aux e z acc =
-            case z of
+        aux ys acc =
+            case ys of
                 [] ->
                     Just acc
 
-                zs :: zss ->
-                    case e zs of
-                        Just val ->
-                            Just
-                                (val
-                                    ++ acc
-                                    ++ (case aux e zss acc of
-                                            Just vall ->
-                                                vall
-
-                                            Nothing ->
-                                                []
-                                       )
-                                )
+                y :: ys_ ->
+                    case f y of
+                        Just zs ->
+                            aux ys_ (acc ++ zs)
 
                         _ ->
                             Nothing
     in
-    aux f xs []
+    aux xs []
 
 
 
