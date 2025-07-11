@@ -278,11 +278,11 @@ match ( v, p ) =
                 _ ->
                     Nothing
 
-        ConstructorP ( s1, ptrn ) ->
+        ConstructorP ( x, pat ) ->
             case v of
-                Constructor ( s2, v2 ) ->
-                    if s1 == s2 then
-                        match ( v2, ptrn )
+                Constructor ( y, val ) ->
+                    if x == y then
+                        match ( val, pat )
 
                     else
                         Nothing
