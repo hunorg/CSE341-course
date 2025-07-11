@@ -246,27 +246,21 @@ countSomeVarTests =
 checkPatTests =
     let
         test1 =
-            -- No variables at all
             checkPat Wildcard == True
 
         test2 =
-            -- One variable
             checkPat (Variable "x") == True
 
         test3 =
-            -- Two different variables
             checkPat (TupleP [ Variable "x", Variable "y" ]) == True
 
         test4 =
-            -- Two of the same variable
             checkPat (TupleP [ Variable "x", Variable "x" ]) == False
 
         test5 =
-            -- Nested pattern with duplicate variable
             checkPat (ConstructorP ( "C", TupleP [ Variable "a", ConstructorP ( "D", Variable "a" ) ] )) == False
 
         test6 =
-            -- Deeply nested distinct variables
             checkPat
                 (ConstructorP
                     ( "Just"
@@ -279,3 +273,100 @@ checkPatTests =
                 == True
     in
     [ test1, test2, test3, test4, test5, test6 ]
+
+
+matchTests =
+    let
+        test1 =
+            match ( Const 5, Wildcard ) == Just []
+
+        test2 =
+            match ( Const 10, Variable "x" ) == Just [ ( "x", Const 10 ) ]
+
+        test3 =
+            match ( Unit, Variable "u" ) == Just [ ( "u", Unit ) ]
+
+        test4 =
+            match ( Unit, UnitP ) == Just []
+
+        test5 =
+            match ( Const 42, ConstP 42 ) == Just []
+
+        test6 =
+            match ( Const 1, ConstP 2 ) == Nothing
+
+        test7 =
+            match ( Unit, ConstP 1 ) == Nothing
+
+        test8 =
+            match
+                ( Tuple [ Const 1, Const 2 ]
+                , TupleP [ Variable "a", Variable "b" ]
+                )
+                == Just [ ( "a", Const 1 ), ( "b", Const 2 ) ]
+
+        test9 =
+            match
+                ( Tuple [ Const 1 ]
+                , TupleP [ Variable "x", Variable "y" ]
+                )
+                == Nothing
+
+        test10 =
+            match
+                ( Tuple [ Const 1, Unit ]
+                , TupleP [ Variable "x", ConstP 2 ]
+                )
+                == Nothing
+
+        test11 =
+            match
+                ( Constructor ( "Some", Const 5 )
+                , ConstructorP ( "Some", Variable "v" )
+                )
+                == Just [ ( "v", Const 5 ) ]
+
+        test12 =
+            match
+                ( Constructor ( "None", Unit )
+                , ConstructorP ( "Some", UnitP )
+                )
+                == Nothing
+
+        test13 =
+            match
+                ( Constructor ( "Some", Const 1 )
+                , ConstructorP ( "Some", ConstP 2 )
+                )
+                == Nothing
+
+        test14 =
+            match
+                ( Tuple [ Const 1, Constructor ( "Some", Const 2 ) ]
+                , TupleP [ Variable "a", ConstructorP ( "Some", Variable "b" ) ]
+                )
+                == Just [ ( "a", Const 1 ), ( "b", Const 2 ) ]
+
+        test15 =
+            match ( Const 1, ConstP 1 ) == Just []
+
+        test16 =
+            match ( Unit, UnitP ) == Just []
+    in
+    [ test1
+    , test2
+    , test3
+    , test4
+    , test5
+    , test6
+    , test7
+    , test8
+    , test9
+    , test10
+    , test11
+    , test12
+    , test13
+    , test14
+    , test15
+    , test16
+    ]

@@ -195,66 +195,37 @@ countSomeVar ( s, p ) =
 
 
 checkPat : Pattern -> Bool
-checkPat ptrn =
+checkPat pat =
     let
         stringCollector : Pattern -> List String
         stringCollector p =
-            let
-                acc =
-                    []
-            in
             case p of
-                Wildcard ->
-                    acc
-
                 Variable x ->
-                    x :: acc
+                    [ x ]
 
                 TupleP ps ->
-                    List.foldl (\pt i -> stringCollector pt ++ i) acc ps
+                    List.foldl (\subP collected -> stringCollector subP ++ collected) [] ps
 
                 ConstructorP ( _, ptn ) ->
-                    stringCollector ptn ++ acc
+                    stringCollector ptn
 
                 _ ->
-                    acc
+                    []
 
-        doesRepeat xs hist =
-            let
-                listExists : (a -> Bool) -> List a -> Bool
-                listExists f l =
-                    case l of
-                        [] ->
-                            False
-
-                        x :: xss ->
-                            if f x then
-                                True
-
-                            else
-                                listExists f xss
-            in
-            let
-                memberOf s1 l =
-                    listExists (\x -> x == s1) l
-            in
+        hasRepeats : List a -> Bool
+        hasRepeats xs =
             case xs of
                 [] ->
-                    True
+                    False
 
-                x :: xss ->
-                    if memberOf x hist then
-                        False
+                x :: xs_ ->
+                    if List.any (\y -> y == x) xs_ then
+                        True
 
                     else
-                        case xss of
-                            [] ->
-                                True
-
-                            _ ->
-                                doesRepeat xss (x :: hist)
+                        hasRepeats xs_
     in
-    doesRepeat (stringCollector ptrn) []
+    stringCollector pat |> hasRepeats |> not
 
 
 match : ( Valu, Pattern ) -> Maybe (List ( String, Valu ))
