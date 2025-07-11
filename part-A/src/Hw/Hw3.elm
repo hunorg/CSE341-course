@@ -234,16 +234,8 @@ match ( v, p ) =
         Wildcard ->
             Just []
 
-        Variable s ->
-            case v of
-                Const _ ->
-                    Just [ ( s, v ) ]
-
-                Unit ->
-                    Just [ ( s, v ) ]
-
-                _ ->
-                    Nothing
+        Variable name ->
+            Just [ ( name, v ) ]
 
         UnitP ->
             if v == Unit then
@@ -252,10 +244,10 @@ match ( v, p ) =
             else
                 Nothing
 
-        ConstP n ->
+        ConstP x ->
             case v of
-                Const m ->
-                    if n == m then
+                Const y ->
+                    if x == y then
                         Just []
 
                     else
@@ -267,25 +259,16 @@ match ( v, p ) =
         TupleP ps ->
             case v of
                 Tuple vs ->
-                    if List.length ps == List.length ps then
+                    if List.length ps == List.length vs then
                         let
                             listPairZip : List a -> List b -> List ( a, b )
-                            listPairZip l1 l2 =
-                                case l1 of
-                                    [] ->
+                            listPairZip xs ys =
+                                case ( xs, ys ) of
+                                    ( x :: xs_, y :: ys_ ) ->
+                                        ( x, y ) :: listPairZip xs_ ys_
+
+                                    _ ->
                                         []
-
-                                    x :: xs ->
-                                        case l2 of
-                                            [] ->
-                                                []
-
-                                            x1 :: xs1 ->
-                                                if List.length l1 == List.length l2 then
-                                                    ( x, x1 ) :: listPairZip xs xs1
-
-                                                else
-                                                    []
                         in
                         allAnswers (\( x, y ) -> match ( x, y )) (listPairZip vs ps)
 

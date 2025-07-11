@@ -370,3 +370,61 @@ matchTests =
     , test15
     , test16
     ]
+
+
+firstMatchTests =
+    let
+        val1 =
+            Const 42
+
+        val2 =
+            Unit
+
+        val3 =
+            Tuple [ Const 1, Const 2 ]
+
+        val4 =
+            Constructor ( "Just", Const 5 )
+
+        pattern1 =
+            ConstP 42
+
+        pattern2 =
+            Wildcard
+
+        pattern3 =
+            Variable "x"
+
+        pattern4 =
+            TupleP [ ConstP 1, Variable "y" ]
+
+        pattern5 =
+            ConstructorP ( "Just", Variable "z" )
+
+        pattern6 =
+            ConstP 100
+
+        test1 =
+            firstMatch val1 [ pattern1, pattern6 ] == Just []
+
+        test2 =
+            firstMatch val1 [ pattern6, pattern1 ] == Just []
+
+        test3 =
+            firstMatch val1 [ pattern6 ] == Nothing
+
+        test4 =
+            firstMatch val2 [ pattern1, pattern2 ] == Just []
+
+        test5 =
+            firstMatch val3 [ pattern4, pattern2 ]
+                == Just [ ( "y", Const 2 ) ]
+
+        test6 =
+            firstMatch val4 [ pattern5 ]
+                == Just [ ( "z", Const 5 ) ]
+
+        test7 =
+            firstMatch val4 [] == Nothing
+    in
+    [ test1, test2, test3, test4, test5, test6, test7 ]
