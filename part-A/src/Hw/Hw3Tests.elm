@@ -153,3 +153,129 @@ allAnswersTests =
             allAnswers f1 [ -1, -2 ] == Nothing
     in
     [ test1, test2, test3, test4 ]
+
+
+countWildcardsTests =
+    let
+        test1 =
+            countWildcards Wildcard == 1
+
+        test2 =
+            countWildcards (Variable "x") == 0
+
+        test3 =
+            countWildcards (TupleP [ Wildcard, Variable "y", Wildcard ]) == 2
+
+        test4 =
+            countWildcards (ConstructorP ( "Just", Wildcard )) == 1
+
+        test5 =
+            countWildcards
+                (ConstructorP
+                    ( "Pair"
+                    , TupleP
+                        [ Variable "a"
+                        , ConstructorP ( "Box", Wildcard )
+                        ]
+                    )
+                )
+                == 1
+    in
+    [ test1, test2, test3, test4, test5 ]
+
+
+countWildAndVariableLengthsTests =
+    let
+        test1 =
+            countWildAndVariableLengths Wildcard == 1
+
+        test2 =
+            countWildAndVariableLengths (Variable "x") == 1
+
+        test3 =
+            countWildAndVariableLengths (Variable "abc") == 3
+
+        test4 =
+            countWildAndVariableLengths (TupleP [ Wildcard, Variable "hi", Wildcard ]) == 1 + 2 + 1
+
+        test5 =
+            countWildAndVariableLengths
+                (ConstructorP
+                    ( "Just"
+                    , TupleP
+                        [ Variable "long", Wildcard ]
+                    )
+                )
+                == 4
+                + 1
+    in
+    [ test1, test2, test3, test4, test5 ]
+
+
+countSomeVarTests =
+    let
+        test1 =
+            countSomeVar ( "x", Wildcard ) == 0
+
+        test2 =
+            countSomeVar ( "x", Variable "x" ) == 1
+
+        test3 =
+            countSomeVar ( "x", Variable "y" ) == 0
+
+        test4 =
+            countSomeVar
+                ( "z"
+                , TupleP [ Variable "z", Variable "a", Variable "z" ]
+                )
+                == 2
+
+        test5 =
+            countSomeVar
+                ( "id"
+                , ConstructorP
+                    ( "Node"
+                    , TupleP [ Variable "id", ConstructorP ( "Leaf", Variable "id" ) ]
+                    )
+                )
+                == 2
+    in
+    [ test1, test2, test3, test4, test5 ]
+
+
+checkPatTests =
+    let
+        test1 =
+            -- No variables at all
+            checkPat Wildcard == True
+
+        test2 =
+            -- One variable
+            checkPat (Variable "x") == True
+
+        test3 =
+            -- Two different variables
+            checkPat (TupleP [ Variable "x", Variable "y" ]) == True
+
+        test4 =
+            -- Two of the same variable
+            checkPat (TupleP [ Variable "x", Variable "x" ]) == False
+
+        test5 =
+            -- Nested pattern with duplicate variable
+            checkPat (ConstructorP ( "C", TupleP [ Variable "a", ConstructorP ( "D", Variable "a" ) ] )) == False
+
+        test6 =
+            -- Deeply nested distinct variables
+            checkPat
+                (ConstructorP
+                    ( "Just"
+                    , TupleP
+                        [ Variable "a"
+                        , ConstructorP ( "Box", TupleP [ Variable "b", Variable "c" ] )
+                        ]
+                    )
+                )
+                == True
+    in
+    [ test1, test2, test3, test4, test5, test6 ]

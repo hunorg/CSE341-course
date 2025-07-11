@@ -1,7 +1,5 @@
 module Hw.Hw3 exposing (..)
 
-import Array exposing (get)
-
 
 type Pattern
     = Wildcard
@@ -9,23 +7,24 @@ type Pattern
     | UnitP
     | ConstP Int
     | TupleP (List Pattern)
-    | ConstructorP String Pattern
+    | ConstructorP ( String, Pattern )
 
 
 type Valu
     = Const Int
     | Unit
     | Tuple (List Valu)
-    | Constructor String Valu
+    | Constructor ( String, Valu )
 
 
 g : (() -> Int) -> (String -> Int) -> Pattern -> Int
-g f1 f2 ptrn =
+g f1 f2 p =
     let
+        r : Pattern -> Int
         r =
             g f1 f2
     in
-    case ptrn of
+    case p of
         Wildcard ->
             f1 ()
 
@@ -33,10 +32,10 @@ g f1 f2 ptrn =
             f2 x
 
         TupleP ps ->
-            List.foldl (\p i -> r p + i) 0 ps
+            List.foldl (\subP acc -> r subP + acc) 0 ps
 
-        ConstructorP _ pt ->
-            r pt
+        ConstructorP ( _, subP ) ->
+            r subP
 
         _ ->
             0
@@ -163,29 +162,30 @@ allAnswers f xs =
 
 
 
--- g gives back a number
--- f1 determines default value
--- variable x is a string to wich I apply f2 to convert it into an int
--- tuple ps goes trough all patterns and based on that patten is a wildc or variable, converts it into a nr and sums it
--- you have a list of patterns, the wildcard patterns became default values,
--- the patterns that aren't wildcards are being matched with the help of the f2
+{-
+   The function g takes two functions and a pattern as arguments.
+   The first function (f1) is applied to each Wildcard pattern,
+   and the second function (f2) is applied to each Variable pattern’s name.
+   g returns a number that combines the results of these applications
+   over the entire pattern.
+-}
 
 
 countWildcards : Pattern -> Int
-countWildcards pt =
-    g (\() -> 1) (\_ -> 0) pt
+countWildcards =
+    g (\() -> 1) (\_ -> 0)
 
 
 countWildAndVariableLengths : Pattern -> Int
-countWildAndVariableLengths pt =
-    g (\() -> 1) (\s -> String.length s) pt + countWildcards pt
+countWildAndVariableLengths =
+    g (\() -> 1) (\s -> String.length s)
 
 
 countSomeVar : ( String, Pattern ) -> Int
 countSomeVar ( s, p ) =
     g (\() -> 0)
-        (\z ->
-            if s == z then
+        (\var ->
+            if s == var then
                 1
 
             else
@@ -197,6 +197,7 @@ countSomeVar ( s, p ) =
 checkPat : Pattern -> Bool
 checkPat ptrn =
     let
+        stringCollector : Pattern -> List String
         stringCollector p =
             let
                 acc =
@@ -207,12 +208,12 @@ checkPat ptrn =
                     acc
 
                 Variable x ->
-                    acc ++ [ x ]
+                    x :: acc
 
                 TupleP ps ->
                     List.foldl (\pt i -> stringCollector pt ++ i) acc ps
 
-                ConstructorP _ ptn ->
+                ConstructorP ( _, ptn ) ->
                     stringCollector ptn ++ acc
 
                 _ ->
@@ -323,9 +324,9 @@ match ( v, p ) =
                 _ ->
                     Nothing
 
-        ConstructorP s1 ptrn ->
+        ConstructorP ( s1, ptrn ) ->
             case v of
-                Constructor s2 v2 ->
+                Constructor ( s2, v2 ) ->
                     if s1 == s2 then
                         match ( v2, ptrn )
 
